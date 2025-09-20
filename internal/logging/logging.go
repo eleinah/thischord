@@ -22,6 +22,6 @@ func FatalLog(msg string, err error) {
 		slog.Error("FATAL! " + msg + ":: " + err.Error())
 		os.Exit(1)
 	}
-	slog.Error(msg)
+	slog.Error("FATAL! " + msg)
 	os.Exit(1)
 }
