@@ -7,5 +7,5 @@ func YTPlay(interactionState *state.InteractionState) {
 	//
 	//url := opts[0].StringValue()
 
-	interactionState.Reply("Not implemented yet.")
+	interactionState.Reply("Not implemented yet.", true)
 }

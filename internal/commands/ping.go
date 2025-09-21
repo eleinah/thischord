@@ -1,7 +1,13 @@
 package commands
 
-import "github.com/eleinah/thischord/internal/state"
+import (
+	"fmt"
+	"time"
+
+	"github.com/eleinah/thischord/internal/state"
+)
 
 func Ping(interactionState *state.InteractionState) {
-	interactionState.Reply("Pong!")
+	start := time.Now()
+	interactionState.Reply(fmt.Sprintf("Pong! (took %v)", time.Since(start)), true)
 }
