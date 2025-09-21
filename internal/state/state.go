@@ -14,16 +14,15 @@ type InteractionState struct {
 	GuildID     string
 	ChannelID   string
 	CommandName string
-	RawArgs     map[string]any
 	Args        map[string]string
 	Responded   bool
 }
 
 func (s *InteractionState) ArgumentstoString() string {
-	var output string
+	output := ""
 	for k, v := range s.Args {
 		if v != "" {
-			output += " " + k + "=" + v
+			output += k + "=" + v + " "
 		}
 	}
 	return output
@@ -42,24 +41,6 @@ func (s *InteractionState) Reply(content string) {
 	s.Responded = true
 }
 
-func (s *InteractionState) standardizeArguments() {
-	switch s.CommandName {
-	case "add":
-		if val, exists := s.RawArgs["num1"]; exists {
-			switch v := val.(type) {
-			case int64:
-				s.Args["num1"] = strconv.Itoa(int(v))
-			}
-		}
-		if val, exists := s.RawArgs["num2"]; exists {
-			switch v := val.(type) {
-			case int64:
-				s.Args["num2"] = strconv.Itoa(int(v))
-			}
-		}
-	}
-}
-
 func NewInteractionState(s *discordgo.Session, i *discordgo.InteractionCreate) *InteractionState {
 	interactionState := &InteractionState{
 		Session:     s,
@@ -68,20 +49,21 @@ func NewInteractionState(s *discordgo.Session, i *discordgo.InteractionCreate) *
 		GuildID:     i.GuildID,
 		ChannelID:   i.ChannelID,
 		CommandName: i.ApplicationCommandData().Name,
-		RawArgs:     make(map[string]any),
 		Args:        make(map[string]string),
 		Responded:   false,
 	}
 
 	if data := i.ApplicationCommandData(); data.Name != "" {
 		for _, option := range data.Options {
-			interactionState.RawArgs[option.Name] = option.Value
+			switch option.Type {
+			case discordgo.ApplicationCommandOptionInteger:
+				interactionState.Args[option.Name] = strconv.FormatInt(option.IntValue(), 10)
+			}
 		}
 	}
 	if interactionState.User == nil && i.Member != nil {
 		interactionState.User = i.Member.User
 	}
 
-	interactionState.standardizeArguments()
 	return interactionState
 }

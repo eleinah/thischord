@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/eleinah/thischord/internal/state"
 )
@@ -13,8 +14,8 @@ func Add(interactionState *state.InteractionState) {
 	sum := num1 + num2
 	sumString := fmt.Sprintf("%d + %d = %d", num1, num2, sum)
 
-	interactionState.RawArgs["num1"] = num1
-	interactionState.RawArgs["num2"] = num2
+	interactionState.Args["num1"] = strconv.FormatInt(num1, 10)
+	interactionState.Args["num2"] = strconv.FormatInt(num2, 10)
 
 	interactionState.Reply(sumString)
 }
