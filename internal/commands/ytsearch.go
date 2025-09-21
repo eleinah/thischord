@@ -10,7 +10,7 @@ import (
 	"github.com/lrstanley/go-ytdlp"
 )
 
-func Query(interactionState *state.InteractionState) {
+func YTSearch(interactionState *state.InteractionState) {
 	opts := interactionState.Interaction.ApplicationCommandData().Options
 
 	query := opts[0].StringValue()

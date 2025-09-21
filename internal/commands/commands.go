@@ -30,6 +30,8 @@ func SetupSlashCommands(s *discordgo.Session) {
 				},
 			},
 		},
+		{Name: "join", Description: "join a voice channel"},
+		{Name: "leave", Description: "leave a voice channel"},
 		{Name: "ytsearch", Description: "query YouTube for a song",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
@@ -43,6 +45,16 @@ func SetupSlashCommands(s *discordgo.Session) {
 					Name:        "limit",
 					Description: "number of results to return (default: 5, max: 50)",
 					Required:    false,
+				},
+			},
+		},
+		{Name: "ytplay", Description: "play a YouTube video",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "url",
+					Description: "youtube url eg. https://www.youtube.com/watch?v=???????????",
+					Required:    true,
 				},
 			},
 		},

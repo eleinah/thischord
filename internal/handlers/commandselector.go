@@ -21,7 +21,13 @@ func commandSelector(interactionState *state.InteractionState) {
 		commands.Greet(interactionState)
 	case "add":
 		commands.Add(interactionState)
+	case "join":
+		commands.Join(interactionState)
+	case "leave":
+		commands.Leave(interactionState)
 	case "ytsearch":
-		commands.Query(interactionState)
+		commands.YTSearch(interactionState)
+	case "ytplay":
+		commands.YTPlay(interactionState)
 	}
 }
