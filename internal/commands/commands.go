@@ -27,8 +27,26 @@ func SetupSlashCommands(s *discordgo.Session) {
 					Name:        "second",
 					Description: "second number",
 					Required:    true,
-				}},
-		}}
+				},
+			},
+		},
+		{Name: "ytsearch", Description: "query YouTube for a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "query",
+					Description: "song name",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "limit",
+					Description: "number of results to return (default: 5, max: 50)",
+					Required:    false,
+				},
+			},
+		},
+	}
 
 	existingCommands, err := s.ApplicationCommands(s.State.User.ID, "")
 	if err != nil {

@@ -19,7 +19,7 @@ type InteractionState struct {
 }
 
 func (s *InteractionState) ArgumentstoString() string {
-	output := ""
+	output := " "
 	for k, v := range s.Args {
 		if v != "" {
 			output += k + "=" + v + " "
