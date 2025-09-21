@@ -1,10 +1,26 @@
 package helpers
 
 import (
+	"fmt"
 	"log/slog"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/eleinah/thischord/internal/state"
 )
+
+func ListCommandOptions(options []*discordgo.ApplicationCommandOption) string {
+	strOptions := "["
+	for i, option := range options {
+		if i < len(options)-1 {
+			strOptions += fmt.Sprintf("%s,", option.Name)
+		} else {
+			strOptions += fmt.Sprintf("%s", option.Name)
+		}
+	}
+	strOptions += "]"
+
+	return strOptions
+}
 
 func JoinUserVoiceChannel(interactionState *state.InteractionState) {
 	guildID := interactionState.Interaction.GuildID
@@ -17,7 +33,7 @@ func JoinUserVoiceChannel(interactionState *state.InteractionState) {
 
 	_, err := interactionState.Session.ChannelVoiceJoin(guildID, channelID, false, true)
 	if err != nil {
-		slog.Error("Failed to join voice channel:", err.Error())
+		slog.Error("Failed to join voice channel:", "error", err.Error())
 	}
 
 	interactionState.Reply("Joined voice channel.", false)
@@ -35,7 +51,7 @@ func LeaveUserVoiceChannel(interactionState *state.InteractionState) {
 
 	_, err := interactionState.Session.ChannelVoiceJoin(guildID, "", false, true)
 	if err != nil {
-		slog.Error("Failed to leave voice channel:", err.Error())
+		slog.Error("Failed to leave voice channel:", "error", err.Error())
 	}
 
 	interactionState.Reply("Left voice channel.", false)
@@ -45,7 +61,7 @@ func IsUserInVoiceChannel(interactionState *state.InteractionState) (inChannel b
 	guildID := interactionState.Interaction.GuildID
 	guild, err := interactionState.Session.State.Guild(guildID)
 	if err != nil {
-		slog.Error("Failed to get guild:", err.Error())
+		slog.Error("Failed to get guild:", "error", err.Error())
 	}
 
 	for _, vs := range guild.VoiceStates {

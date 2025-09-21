@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/eleinah/thischord/internal/helpers"
 	"github.com/eleinah/thischord/internal/logging"
 	"github.com/eleinah/thischord/internal/state"
 )
@@ -66,15 +67,17 @@ func SetupSlashCommands(s *discordgo.Session) {
 	}
 
 	for _, command := range commands {
+		strOptions := helpers.ListCommandOptions(command.Options)
+
 		if state.DisabledCommands[command.Name] {
-			slog.Warn("Skipping disabled command: " + command.Name)
+			slog.Warn("...skipping disabled command...", "name", command.Name, "options", strOptions, "description", command.Description)
 			for _, existingCommand := range existingCommands {
 				if existingCommand.Name == command.Name {
 					err := s.ApplicationCommandDelete(s.State.User.ID, existingCommand.GuildID, existingCommand.ID)
 					if err != nil {
-						slog.Error("Error deleting command:", err)
+						slog.Error("Error deleting command:", "error", err)
 					}
-					slog.Info("Deleted command: " + command.Name)
+					slog.Info("...deleted command...", "name", command.Name, "options", strOptions, "description", command.Description)
 				}
 			}
 			continue
@@ -83,7 +86,7 @@ func SetupSlashCommands(s *discordgo.Session) {
 		for _, existingCommand := range existingCommands {
 			if existingCommand.Name == command.Name {
 				found = true
-				slog.Info("Retrieved command: " + command.Name)
+				slog.Info("...retrieved command...", "name", command.Name, "options", strOptions, "description", command.Description)
 				break
 			}
 		}
@@ -92,10 +95,10 @@ func SetupSlashCommands(s *discordgo.Session) {
 			if err != nil {
 				logging.FatalLog("Error creating command", err)
 			} else {
-				slog.Info("Created command: " + command.Name)
+				slog.Info("...created command...", "name", command.Name, "options", strOptions, "description", command.Description)
 			}
 		}
 	}
 
-	slog.Info("Finished setting up slash commands")
+	slog.Info("Finished setting up slash commands!")
 }

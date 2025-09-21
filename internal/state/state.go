@@ -37,7 +37,7 @@ func (s *InteractionState) Reply(content string, isInvisible bool) {
 			},
 		})
 		if err != nil {
-			slog.Error("Error sending reply: ", err)
+			slog.Error("Error sending reply", "error", err)
 		}
 		s.Responded = true
 	} else {
@@ -49,7 +49,7 @@ func (s *InteractionState) Reply(content string, isInvisible bool) {
 			},
 		})
 		if err != nil {
-			slog.Error("Error sending reply: ", err)
+			slog.Error("Error sending reply", "error", err)
 		}
 		s.Responded = true
 	}

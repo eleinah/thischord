@@ -33,7 +33,7 @@ func YTSearch(interactionState *state.InteractionState) {
 		Run(context.Background(), search)
 
 	if err != nil {
-		slog.Error("Error running ytdlp for query:", err)
+		slog.Error("Error running ytdlp for query:", "error", err)
 	}
 
 	results := strings.Split(out.Stdout, "\n")
