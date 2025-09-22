@@ -31,12 +31,17 @@ func JoinUserVoiceChannel(interactionState *state.InteractionState) {
 		interactionState.Reply("You are not in a voice channel.", true)
 	}
 
-	_, err := interactionState.Session.ChannelVoiceJoin(guildID, channelID, false, true)
-	if err != nil {
-		slog.Error("Failed to join voice channel:", "error", err.Error())
-	}
+	if state.VoiceConnected {
+		interactionState.Reply("I am already in a voice channel.", true)
+	} else {
+		_, err := interactionState.Session.ChannelVoiceJoin(guildID, channelID, false, true)
+		if err != nil {
+			slog.Error("Failed to join voice channel:", "error", err.Error())
+		}
 
-	interactionState.Reply("Joined voice channel.", false)
+		state.VoiceConnected = true
+		interactionState.Reply("Joined voice channel.", false)
+	}
 }
 
 func LeaveUserVoiceChannel(interactionState *state.InteractionState) {
@@ -49,12 +54,16 @@ func LeaveUserVoiceChannel(interactionState *state.InteractionState) {
 		return
 	}
 
-	_, err := interactionState.Session.ChannelVoiceJoin(guildID, "", false, true)
-	if err != nil {
-		slog.Error("Failed to leave voice channel:", "error", err.Error())
+	if !state.VoiceConnected {
+		interactionState.Reply("I am not in a voice channel.", true)
+	} else {
+		_, err := interactionState.Session.ChannelVoiceJoin(guildID, "", false, true)
+		if err != nil {
+			slog.Error("Failed to leave voice channel:", "error", err.Error())
+		}
+		state.VoiceConnected = false
+		interactionState.Reply("Left voice channel.", false)
 	}
-
-	interactionState.Reply("Left voice channel.", false)
 }
 
 func IsUserInVoiceChannel(interactionState *state.InteractionState) (inChannel bool, channelID string) {
@@ -71,5 +80,3 @@ func IsUserInVoiceChannel(interactionState *state.InteractionState) (inChannel b
 	}
 	return false, ""
 }
-
-// TODO: Add a function to get whether the bot is in a voice channel.
