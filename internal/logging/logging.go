@@ -40,6 +40,15 @@ func colorizeAttr(groups []string, a slog.Attr) slog.Attr {
 	if a.Key == "options" {
 		return tint.Attr(ANSIGray, a)
 	}
+	if a.Key == "username" {
+		return tint.Attr(ANSIBrightBlue, a)
+	}
+	if a.Key == "command" {
+		return tint.Attr(ANSIBrightBlue, a)
+	}
+	if a.Key == "args" {
+		return tint.Attr(ANSIBrightBlue, a)
+	}
 	return a
 }
 
