@@ -11,6 +11,8 @@ import (
 )
 
 func YTSearch(interactionState *state.InteractionState) {
+	interactionState.Defer()
+
 	opts := interactionState.Interaction.ApplicationCommandData().Options
 
 	query := opts[0].StringValue()
@@ -19,7 +21,7 @@ func YTSearch(interactionState *state.InteractionState) {
 	if len(opts) > 1 {
 		maxResults = opts[1].IntValue()
 		if int(maxResults) != 0 && int(maxResults) < 0 || int(maxResults) > 25 {
-			interactionState.Reply("Limit must be between 0 and 25", true)
+			interactionState.EditDeferred("Limit must be between 0 and 25")
 			slog.Debug("Limit must be between 0 and 25")
 			return
 		}
@@ -52,8 +54,8 @@ func YTSearch(interactionState *state.InteractionState) {
 
 	if len(reply) > 1999 {
 		slog.Debug("Reply too long, consider using a smaller limit.")
-		interactionState.Reply("Reply too long, consider using a smaller limit.", true)
+		interactionState.EditDeferred("Reply too long, consider using a smaller limit.")
 		return
 	}
-	interactionState.Reply(reply, false)
+	interactionState.EditDeferred(reply)
 }

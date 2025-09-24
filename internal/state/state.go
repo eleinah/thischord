@@ -55,6 +55,48 @@ func (s *InteractionState) InvisibleReply(content string) {
 	s.Responded = true
 }
 
+func (s *InteractionState) Defer() {
+	data := &discordgo.InteractionResponseData{}
+
+	resp := &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Data: data,
+	}
+
+	err := s.Session.InteractionRespond(s.Interaction.Interaction, resp)
+	if err != nil {
+		slog.Error("Error deferring interaction", "error", err)
+	}
+	s.Responded = true
+}
+
+func (s *InteractionState) InvisibleDefer() {
+	data := &discordgo.InteractionResponseData{
+		Flags: 1 << 6,
+	}
+
+	resp := &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Data: data,
+	}
+
+	err := s.Session.InteractionRespond(s.Interaction.Interaction, resp)
+	if err != nil {
+		slog.Error("Error deferring interaction", "error", err)
+	}
+	s.Responded = true
+}
+
+func (s *InteractionState) EditDeferred(content string) {
+	hook := &discordgo.WebhookEdit{
+		Content: &content,
+	}
+
+	if _, err := s.Session.InteractionResponseEdit(s.Interaction.Interaction, hook); err != nil {
+		slog.Error("Error editing deferred response", "error", err)
+	}
+}
+
 func NewInteractionState(s *discordgo.Session, i *discordgo.InteractionCreate) *InteractionState {
 	interactionState := &InteractionState{
 		Session:     s,
