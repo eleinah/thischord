@@ -70,23 +70,6 @@ func (s *InteractionState) Defer() {
 	s.Responded = true
 }
 
-func (s *InteractionState) InvisibleDefer() {
-	data := &discordgo.InteractionResponseData{
-		Flags: 1 << 6,
-	}
-
-	resp := &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-		Data: data,
-	}
-
-	err := s.Session.InteractionRespond(s.Interaction.Interaction, resp)
-	if err != nil {
-		slog.Error("Error deferring interaction", "error", err)
-	}
-	s.Responded = true
-}
-
 func (s *InteractionState) EditDeferred(content string) {
 	hook := &discordgo.WebhookEdit{
 		Content: &content,
