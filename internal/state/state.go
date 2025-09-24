@@ -28,31 +28,31 @@ func (s *InteractionState) ArgumentstoString() string {
 	return output
 }
 
-func (s *InteractionState) Reply(content string, isInvisible bool) {
-	if !isInvisible {
-		err := s.Session.InteractionRespond(s.Interaction.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: content,
-			},
-		})
-		if err != nil {
-			slog.Error("Error sending reply", "error", err)
-		}
-		s.Responded = true
-	} else {
-		err := s.Session.InteractionRespond(s.Interaction.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: content,
-				Flags:   1 << 6,
-			},
-		})
-		if err != nil {
-			slog.Error("Error sending reply", "error", err)
-		}
-		s.Responded = true
+func (s *InteractionState) Reply(content string) {
+	err := s.Session.InteractionRespond(s.Interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
+	})
+	if err != nil {
+		slog.Error("Error sending reply", "error", err)
 	}
+	s.Responded = true
+}
+
+func (s *InteractionState) InvisibleReply(content string) {
+	err := s.Session.InteractionRespond(s.Interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+			Flags:   1 << 6,
+		},
+	})
+	if err != nil {
+		slog.Error("Error sending reply", "error", err)
+	}
+	s.Responded = true
 }
 
 func NewInteractionState(s *discordgo.Session, i *discordgo.InteractionCreate) *InteractionState {
