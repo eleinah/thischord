@@ -13,5 +13,5 @@ func Add(interactionState *state.InteractionState) {
 	sum := num1 + num2
 	sumString := fmt.Sprintf("%d + %d = %d", num1, num2, sum)
 
-	interactionState.Reply(sumString, false)
+	interactionState.Reply(sumString)
 }

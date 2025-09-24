@@ -28,11 +28,11 @@ func JoinUserVoiceChannel(interactionState *state.InteractionState) {
 	inChannel, channelID := IsUserInVoiceChannel(interactionState)
 
 	if !inChannel {
-		interactionState.Reply("You are not in a voice channel.", true)
+		interactionState.InvisibleReply("You are not in a voice channel.")
 	}
 
 	if state.VoiceConnected {
-		interactionState.Reply("I am already in a voice channel.", true)
+		interactionState.InvisibleReply("I am already in a voice channel.")
 	} else {
 		_, err := interactionState.Session.ChannelVoiceJoin(guildID, channelID, false, true)
 		if err != nil {
@@ -40,7 +40,7 @@ func JoinUserVoiceChannel(interactionState *state.InteractionState) {
 		}
 
 		state.VoiceConnected = true
-		interactionState.Reply("Joined voice channel.", false)
+		interactionState.Reply("Joined voice channel.")
 	}
 }
 
@@ -50,19 +50,19 @@ func LeaveUserVoiceChannel(interactionState *state.InteractionState) {
 	inChannel, _ := IsUserInVoiceChannel(interactionState)
 
 	if !inChannel {
-		interactionState.Reply("You are not in a voice channel.", true)
+		interactionState.InvisibleReply("You are not in a voice channel.")
 		return
 	}
 
 	if !state.VoiceConnected {
-		interactionState.Reply("I am not in a voice channel.", true)
+		interactionState.InvisibleReply("I am not in a voice channel.")
 	} else {
 		_, err := interactionState.Session.ChannelVoiceJoin(guildID, "", false, true)
 		if err != nil {
 			slog.Error("Failed to leave voice channel:", "error", err.Error())
 		}
 		state.VoiceConnected = false
-		interactionState.Reply("Left voice channel.", false)
+		interactionState.Reply("Left voice channel.")
 	}
 }
 

@@ -10,7 +10,7 @@ import (
 func commandSelector(interactionState *state.InteractionState) {
 	if state.DisabledCommands[interactionState.CommandName] {
 		replyString := fmt.Sprintf("'%s' is disabled.", interactionState.CommandName)
-		interactionState.Reply(replyString, true)
+		interactionState.InvisibleReply(replyString)
 		return
 	}
 

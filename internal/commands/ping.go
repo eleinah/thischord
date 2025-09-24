@@ -9,5 +9,5 @@ import (
 
 func Ping(interactionState *state.InteractionState) {
 	start := time.Now()
-	interactionState.Reply(fmt.Sprintf("Pong! (took %v)", time.Since(start)), true)
+	interactionState.InvisibleReply(fmt.Sprintf("Pong! (took %v)", time.Since(start)))
 }
