@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/hraban/opus"
+	"gopkg.in/hraban/opus.v2"
 )
 
 var (
