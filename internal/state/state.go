@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/hraban/opus"
 )
 
 var (
@@ -12,6 +13,7 @@ var (
 	DisabledCommands = make(map[string]bool)
 	VoiceConnected   bool
 	Repeat           bool
+	OpusEncoder      *opus.Encoder
 )
 
 type InteractionState struct {
