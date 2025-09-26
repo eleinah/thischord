@@ -15,12 +15,6 @@ func commandSelector(interactionState *state.InteractionState) {
 	}
 
 	switch interactionState.CommandName {
-	case "ping":
-		commands.Ping(interactionState)
-	case "greet":
-		commands.Greet(interactionState)
-	case "add":
-		commands.Add(interactionState)
 	case "join":
 		commands.Join(interactionState)
 	case "leave":
