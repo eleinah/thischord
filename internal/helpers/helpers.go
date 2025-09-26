@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -22,25 +23,28 @@ func ListCommandOptions(options []*discordgo.ApplicationCommandOption) string {
 	return strOptions
 }
 
-func JoinUserVoiceChannel(interactionState *state.InteractionState) {
+func JoinUserVoiceChannel(interactionState *state.InteractionState) (vc *discordgo.VoiceConnection, err error) {
 	guildID := interactionState.Interaction.GuildID
 
 	inChannel, channelID := IsUserInVoiceChannel(interactionState)
 
 	if !inChannel {
 		interactionState.InvisibleReply("You are not in a voice channel.")
+		return &discordgo.VoiceConnection{}, errors.New("user not in voice channel")
 	}
 
 	if state.VoiceConnected {
 		interactionState.InvisibleReply("I am already in a voice channel.")
+		return &discordgo.VoiceConnection{}, errors.New("bot already in voice channel")
 	} else {
-		_, err := interactionState.Session.ChannelVoiceJoin(guildID, channelID, false, true)
+		vc, err := interactionState.Session.ChannelVoiceJoin(guildID, channelID, false, true)
 		if err != nil {
 			slog.Error("Failed to join voice channel:", "error", err.Error())
 		}
 
 		state.VoiceConnected = true
 		interactionState.Reply("Joined voice channel.")
+		return vc, nil
 	}
 }
 

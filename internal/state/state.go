@@ -3,6 +3,7 @@ package state
 import (
 	"log/slog"
 	"strconv"
+	"sync"
 
 	"github.com/bwmarrin/discordgo"
 	"gopkg.in/hraban/opus.v2"
@@ -12,8 +13,22 @@ var (
 	Token            string
 	DisabledCommands = make(map[string]bool)
 	VoiceConnected   bool
-	Repeat           bool
-	OpusEncoder      *opus.Encoder
+
+	OpusEncoder *opus.Encoder
+
+	Queue      = make(map[string][]string)
+	Playing    = make(map[string]bool)
+	Paused     = make(map[string]bool)
+	Volume     = make(map[string]float64)
+	StopChans  = make(map[string]chan bool)
+	PauseChans = make(map[string]chan bool)
+
+	QueueMtx   sync.Mutex
+	PlayingMtx sync.Mutex
+	PausedMtx  sync.Mutex
+	VolumeMtx  sync.Mutex
+	StopMtx    sync.Mutex
+	PauseChMtx sync.Mutex
 )
 
 type InteractionState struct {
