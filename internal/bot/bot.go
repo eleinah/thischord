@@ -31,8 +31,9 @@ type Bot struct {
 
 func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCreate) {
 	data := event.SlashCommandInteractionData()
+	cmdName := data.CommandName()
 
-	slog.Info("interaction received", "username", event.User().Username, "command", data.CommandName(), "args", getCommandArgs(data.CommandName(), data))
+	slog.Info("interaction received", "username", event.User().Username, "command", cmdName, "args", getCommandArgs(cmdName, data))
 
 	handler, ok := b.Handlers[data.CommandName()]
 	if !ok {
