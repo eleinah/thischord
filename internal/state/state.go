@@ -2,131 +2,47 @@ package state
 
 import (
 	"log/slog"
-	"strconv"
-	"sync"
 
-	"github.com/bwmarrin/discordgo"
-	"gopkg.in/hraban/opus.v2"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 var (
 	Token            string
 	DisabledCommands = make(map[string]bool)
-	VoiceConnected   bool
-
-	OpusEncoder *opus.Encoder
-
-	Queue      = make(map[string][]string)
-	Playing    = make(map[string]bool)
-	Paused     = make(map[string]bool)
-	Volume     = make(map[string]float64)
-	StopChans  = make(map[string]chan bool)
-	PauseChans = make(map[string]chan bool)
-
-	QueueMtx   sync.Mutex
-	PlayingMtx sync.Mutex
-	PausedMtx  sync.Mutex
-	VolumeMtx  sync.Mutex
-	StopMtx    sync.Mutex
-	PauseChMtx sync.Mutex
+	GuildID          snowflake.ID
 )
 
-type InteractionState struct {
-	Session     *discordgo.Session
-	Interaction *discordgo.InteractionCreate
-	User        *discordgo.User
-	GuildID     string
-	ChannelID   string
-	CommandName string
-	Args        map[string]string
-	Responded   bool
+func Reply(content string, e *events.ApplicationCommandInteractionCreate) {
+	if err := e.CreateMessage(discord.NewMessageCreateBuilder().
+		SetContent(content).
+		Build(),
+	); err != nil {
+		slog.Error("Error sending response", "error", err)
+	}
 }
 
-func (s *InteractionState) ArgumentstoString() string {
-	output := " "
-	for k, v := range s.Args {
-		if v != "" {
-			output += k + "=" + v + " "
-		}
+func InvisibleReply(content string, e *events.ApplicationCommandInteractionCreate) {
+	if err := e.CreateMessage(discord.NewMessageCreateBuilder().
+		SetContent(content).
+		SetEphemeral(true).
+		Build(),
+	); err != nil {
+		slog.Error("Error sending response", "error", err)
 	}
-	return output
 }
 
-func (s *InteractionState) Reply(content string) {
-	err := s.Session.InteractionRespond(s.Interaction.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: content,
-		},
-	})
-	if err != nil {
-		slog.Error("Error sending reply", "error", err)
-	}
-	s.Responded = true
-}
-
-func (s *InteractionState) InvisibleReply(content string) {
-	err := s.Session.InteractionRespond(s.Interaction.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: content,
-			Flags:   1 << 6,
-		},
-	})
-	if err != nil {
-		slog.Error("Error sending reply", "error", err)
-	}
-	s.Responded = true
-}
-
-func (s *InteractionState) Defer() {
-	data := &discordgo.InteractionResponseData{}
-
-	resp := &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-		Data: data,
-	}
-
-	err := s.Session.InteractionRespond(s.Interaction.Interaction, resp)
-	if err != nil {
+func Defer(e *events.ApplicationCommandInteractionCreate) {
+	if err := e.DeferCreateMessage(false); err != nil {
 		slog.Error("Error deferring interaction", "error", err)
 	}
-	s.Responded = true
 }
 
-func (s *InteractionState) EditDeferred(content string) {
-	hook := &discordgo.WebhookEdit{
+func EditDeferred(content string, e *events.ApplicationCommandInteractionCreate) {
+	if _, err := e.Client().Rest().UpdateInteractionResponse(e.ApplicationID(), e.Token(), discord.MessageUpdate{
 		Content: &content,
+	}); err != nil {
+		slog.Error("Error editing deferred interaction", "error", err)
 	}
-
-	if _, err := s.Session.InteractionResponseEdit(s.Interaction.Interaction, hook); err != nil {
-		slog.Error("Error editing deferred response", "error", err)
-	}
-}
-
-func NewInteractionState(s *discordgo.Session, i *discordgo.InteractionCreate) *InteractionState {
-	interactionState := &InteractionState{
-		Session:     s,
-		Interaction: i,
-		User:        i.User,
-		GuildID:     i.GuildID,
-		ChannelID:   i.ChannelID,
-		CommandName: i.ApplicationCommandData().Name,
-		Args:        make(map[string]string),
-		Responded:   false,
-	}
-
-	if data := i.ApplicationCommandData(); data.Name != "" {
-		for _, option := range data.Options {
-			switch option.Type {
-			case discordgo.ApplicationCommandOptionInteger:
-				interactionState.Args[option.Name] = strconv.FormatInt(option.IntValue(), 10)
-			}
-		}
-	}
-	if interactionState.User == nil && i.Member != nil {
-		interactionState.User = i.Member.User
-	}
-
-	return interactionState
 }

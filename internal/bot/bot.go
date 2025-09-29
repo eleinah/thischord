@@ -1,16 +1,18 @@
 package bot
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"os/exec"
 	"os/signal"
-	"strings"
 	"syscall"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo"
+	"github.com/disgoorg/disgo/bot"
+	"github.com/disgoorg/disgo/gateway"
+	"github.com/disgoorg/snowflake/v2"
 	"github.com/eleinah/thischord/internal/commands"
-	"github.com/eleinah/thischord/internal/handlers"
 	"github.com/eleinah/thischord/internal/logging"
 	"github.com/eleinah/thischord/internal/state"
 	"github.com/joho/godotenv"
@@ -26,6 +28,8 @@ func setup() {
 		logging.FatalLog("No Discord bot token found in .env file", nil)
 	}
 
+	state.GuildID = snowflake.GetEnv("DISCORD_GUILD_ID")
+
 	if _, err := exec.LookPath("yt-dlp"); err != nil {
 		logging.FatalLog("yt-dlp not found. Please install it: https://github.com/yt-dlp/yt-dlp/wiki/Installation\n", err)
 	}
@@ -37,40 +41,30 @@ func setup() {
 	if _, err := exec.LookPath("ffprobe"); err != nil {
 		slog.Warn("ffprobe not found. This may cause problems with some commands.")
 	}
-
-	disabled := os.Getenv("DISABLED_COMMANDS")
-	for _, command := range strings.Split(disabled, ",") {
-		command = strings.TrimSpace(command)
-		if command != "" {
-			state.DisabledCommands[command] = true
-		}
-	}
 }
 
 func Run() {
 	setup()
 
-	dg, err := discordgo.New("Bot " + state.Token)
+	client, err := disgo.New(state.Token,
+		bot.WithGatewayConfigOpts(gateway.WithIntents(gateway.IntentsGuild)),
+		bot.WithEventListenerFunc(commands.CommandListener),
+	)
 	if err != nil {
-		logging.FatalLog("Error creating Discord session", err)
+		logging.FatalLog("Error creating discord client", err)
+		return
 	}
 
-	dg.AddHandler(handlers.HandleInteractionCreate)
+	defer client.Close(context.TODO())
 
-	err = dg.Open()
-	if err != nil {
-		logging.FatalLog("Error opening connection", err)
+	commands.SetupSlashCommands(client)
+
+	if err = client.OpenGateway(context.TODO()); err != nil {
+		logging.FatalLog("Error opening gateway", err)
 	}
-	defer func(dg *discordgo.Session) {
-		err := dg.Close()
-		if err != nil {
-			logging.FatalLog("Error closing connection", err)
-		}
-	}(dg)
 
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGINT, syscall.SIGTERM)
-	commands.SetupSlashCommands(dg)
 	slog.Info("Bot is now running. Press CTRL-C to exit.")
 	<-exit
 }
