@@ -8,22 +8,22 @@ import (
 )
 
 func getCommandOptions(cmdIface discord.ApplicationCommandCreate) string {
-	body := ""
+	body := strings.Builder{}
 
+	body.WriteString("[")
 	switch cmd := cmdIface.(type) {
 	case discord.SlashCommandCreate:
 		for i, option := range cmd.Options {
 			if i < len(cmd.Options)-1 {
-				body += fmt.Sprintf("%s,", option.OptionName())
+				body.WriteString(fmt.Sprintf("%s,", option.OptionName()))
 			} else {
-				body += fmt.Sprintf("%s", option.OptionName())
+				body.WriteString(fmt.Sprintf("%s", option.OptionName()))
 			}
 		}
 	}
+	body.WriteString("]")
 
-	strOptions := fmt.Sprintf("[%s]", body)
-
-	return strOptions
+	return body.String()
 }
 
 func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) string {
