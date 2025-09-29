@@ -75,8 +75,12 @@ func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) st
 			return ""
 		}
 	}
+
 	strArgs := strings.TrimSpace(args.String())
-	return strArgs[:len(strArgs)-2]
+	if len(strArgs) != 0 {
+		return strArgs[:len(strArgs)-2]
+	}
+	return strArgs
 }
 
 func getCommandName(iface discord.ApplicationCommandCreate) string {
