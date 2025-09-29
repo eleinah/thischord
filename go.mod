@@ -10,9 +10,16 @@ require (
 )
 
 require (
+	github.com/ProtonMail/go-crypto v1.3.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/ulikunitz/xz v0.5.13 // indirect
+)
+
+require (
 	github.com/disgoorg/json v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/lrstanley/go-ytdlp v1.2.5
 	github.com/sasha-s/go-csync v0.0.0-20240107134140-fcbab37b09ad // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
 )

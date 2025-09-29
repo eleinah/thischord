@@ -14,8 +14,8 @@ func CommandListener(event *events.ApplicationCommandInteractionCreate) {
 	data := event.SlashCommandInteractionData()
 
 	switch data.CommandName() {
-	case "defermsg":
-		DeferMsg(&data, event)
+	case "ytsearch":
+		YTSearch(&data, event)
 	}
 }
 
@@ -23,11 +23,6 @@ func SetupSlashCommands(client bot.Client) {
 	slog.Info("Setting up slash commands...")
 
 	commands := []discord.ApplicationCommandCreate{
-		discord.SlashCommandCreate{
-			Name:        "defermsg",
-			Description: "test deferred interactions",
-		},
-
 		discord.SlashCommandCreate{
 			Name:        "join",
 			Description: "join a voice channel",
