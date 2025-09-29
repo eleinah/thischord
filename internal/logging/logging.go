@@ -43,6 +43,8 @@ func colorizeAttr(groups []string, a slog.Attr) slog.Attr {
 		return tint.Attr(ANSIBrightBlue, a)
 	case "args":
 		return tint.Attr(ANSIBrightBlue, a)
+	case "version":
+		return tint.Attr(ANSIBrightGreen, a)
 	}
 	return a
 }
