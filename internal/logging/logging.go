@@ -28,25 +28,20 @@ const (
 )
 
 func colorizeAttr(groups []string, a slog.Attr) slog.Attr {
-	if a.Key == "error" {
+	switch a.Key {
+	case "error":
 		return tint.Attr(ANSIBrightRed, a)
-	}
-	if a.Key == "description" {
+	case "description":
 		return tint.Attr(ANSIGray, a)
-	}
-	if a.Key == "name" {
+	case "name":
 		return tint.Attr(ANSIGray, a)
-	}
-	if a.Key == "options" {
+	case "options":
 		return tint.Attr(ANSIGray, a)
-	}
-	if a.Key == "username" {
+	case "username":
 		return tint.Attr(ANSIBrightBlue, a)
-	}
-	if a.Key == "command" {
+	case "command":
 		return tint.Attr(ANSIBrightBlue, a)
-	}
-	if a.Key == "args" {
+	case "args":
 		return tint.Attr(ANSIBrightBlue, a)
 	}
 	return a
