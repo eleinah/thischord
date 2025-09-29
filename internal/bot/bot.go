@@ -10,25 +10,48 @@ import (
 
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
+	"github.com/disgoorg/disgo/cache"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgo/gateway"
 	"github.com/disgoorg/snowflake/v2"
-	"github.com/eleinah/thischord/internal/commands"
 	"github.com/eleinah/thischord/internal/logging"
-	"github.com/eleinah/thischord/internal/state"
 	"github.com/joho/godotenv"
 )
 
+func newBot() *Bot {
+	return &Bot{}
+}
+
+type Bot struct {
+	Client   bot.Client
+	Handlers map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error
+}
+
+func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCreate) {
+	data := event.SlashCommandInteractionData()
+
+	handler, ok := b.Handlers[data.CommandName()]
+	if !ok {
+		slog.Info("unknown command", "command", data.CommandName())
+		return
+	}
+	if err := handler(event, data); err != nil {
+		slog.Error("error handling command", "error", err)
+	}
+}
+
 func setup() {
 	if err := godotenv.Load("../../.env"); err != nil {
-		logging.FatalLog("Error loading .env file", err)
+		logging.FatalLog("error loading .env file", err)
 	}
 
-	state.Token = os.Getenv("DISCORD_BOT_TOKEN")
-	if state.Token == "" {
-		logging.FatalLog("No Discord bot token found in .env file", nil)
+	Token = os.Getenv("DISCORD_BOT_TOKEN")
+	if Token == "" {
+		logging.FatalLog("no Discord bot token found in .env file", nil)
 	}
 
-	state.GuildID = snowflake.GetEnv("DISCORD_GUILD_ID")
+	GuildID = snowflake.GetEnv("DISCORD_GUILD_ID")
 
 	if _, err := exec.LookPath("yt-dlp"); err != nil {
 		logging.FatalLog("yt-dlp not found. Please install it: https://github.com/yt-dlp/yt-dlp/wiki/Installation\n", err)
@@ -46,25 +69,31 @@ func setup() {
 func Run() {
 	setup()
 
-	client, err := disgo.New(state.Token,
+	b := newBot()
+
+	client, err := disgo.New(Token,
 		bot.WithGatewayConfigOpts(gateway.WithIntents(gateway.IntentsGuild)),
-		bot.WithEventListenerFunc(commands.CommandListener),
+		bot.WithCacheConfigOpts(cache.WithCaches(cache.FlagVoiceStates)),
+		bot.WithEventListenerFunc(b.onApplicationCommand),
 	)
 	if err != nil {
-		logging.FatalLog("Error creating discord client", err)
+		logging.FatalLog("error creating discord client", err)
 		return
 	}
-
+	b.Client = client
 	defer client.Close(context.TODO())
 
-	commands.SetupSlashCommands(client)
+	registerCommands(client)
+	b.Handlers = map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error{
+		"ytsearch": b.ytSearch,
+	}
 
 	if err = client.OpenGateway(context.TODO()); err != nil {
-		logging.FatalLog("Error opening gateway", err)
+		logging.FatalLog("error opening gateway", err)
 	}
 
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGINT, syscall.SIGTERM)
-	slog.Info("Bot is now running. Press CTRL-C to exit.")
+	slog.Info("bot is now running, press CTRL-C to exit")
 	<-exit
 }

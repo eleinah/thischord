@@ -1,4 +1,4 @@
-package commands
+package bot
 
 import (
 	"context"
@@ -8,22 +8,20 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
-	"github.com/eleinah/thischord/internal/state"
 	"github.com/lrstanley/go-ytdlp"
 )
 
-func YTSearch(d *discord.SlashCommandInteractionData, e *events.ApplicationCommandInteractionCreate) {
-	state.Defer(e)
+func (b *Bot) ytSearch(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
+	Defer(event)
 
-	query := d.String("query")
+	query := data.String("query")
 	maxResults := 5
 
-	if len(d.Options) > 1 {
-		maxResults = d.Int("limit")
+	if len(data.Options) > 1 {
+		maxResults = data.Int("limit")
 		if maxResults != 0 && maxResults < 0 || maxResults > 25 {
-			state.EditDeferred("Limit must be between 0 and 25", e)
-			slog.Debug("Limit must be between 0 and 25")
-			return
+			slog.Debug("limit must be between 0 and 25")
+			return EditDeferred("Limit must be between 0 and 25", event)
 		}
 	}
 
@@ -35,7 +33,8 @@ func YTSearch(d *discord.SlashCommandInteractionData, e *events.ApplicationComma
 		Run(context.Background(), search)
 
 	if err != nil {
-		slog.Error("Error running ytdlp for query", "error", err)
+		slog.Error("error running ytdlp for query", "error", err)
+		return EditDeferred("Error running ytdlp for query", event)
 	}
 
 	rawResults := strings.Split(out.Stdout, "\n")
@@ -57,8 +56,8 @@ func YTSearch(d *discord.SlashCommandInteractionData, e *events.ApplicationComma
 	}
 
 	if len(reply) > 1999 {
-		slog.Debug("Reply too long, consider using a smaller limit.")
-		state.EditDeferred("Reply too long, consider using a smaller limit.", e)
+		slog.Debug("reply too long, consider using a smaller limit")
+		return EditDeferred("Reply too long, consider using a smaller limit.", event)
 	}
-	state.EditDeferred(reply, e)
+	return EditDeferred(reply, event)
 }
