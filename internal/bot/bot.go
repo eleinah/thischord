@@ -26,7 +26,7 @@ func newBot() *Bot {
 
 type Bot struct {
 	Client   bot.Client
-	Handlers map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error
+	Handlers map[string]func(e *events.ApplicationCommandInteractionCreate, d discord.SlashCommandInteractionData) error
 }
 
 func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCreate) {
@@ -88,7 +88,9 @@ func Run() {
 	defer client.Close(context.TODO())
 
 	registerCommands(client)
-	b.Handlers = map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error{
+	b.Handlers = map[string]func(e *events.ApplicationCommandInteractionCreate, d discord.SlashCommandInteractionData) error{
+		"join":     b.join,
+		"leave":    b.leave,
 		"ytsearch": ytSearch,
 	}
 	logHandledCommands(b.Handlers)

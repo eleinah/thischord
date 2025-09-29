@@ -11,17 +11,51 @@ import (
 	"github.com/lrstanley/go-ytdlp"
 )
 
-func ytSearch(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	Defer(event)
+const (
+	botMuted    bool = false
+	botDeafened bool = true
+)
 
-	query := data.String("query")
+func (b *Bot) join(e *events.ApplicationCommandInteractionCreate, d discord.SlashCommandInteractionData) error {
+	var voiceState discord.VoiceState
+	var ok bool
+
+	if voiceState, ok = b.isUserInVoice(e); !ok {
+		return InvisibleReply("You must be in a voice channel to use this command.", e)
+	}
+
+	if err := b.Client.UpdateVoiceState(context.TODO(), *e.GuildID(), voiceState.ChannelID, botMuted, botDeafened); err != nil {
+		slog.Error("failed to join voice channel", "error", err)
+		return Reply("Failed to join the voice channel.", e)
+	}
+
+	return Reply("Joined voice channel.", e)
+}
+
+func (b *Bot) leave(e *events.ApplicationCommandInteractionCreate, d discord.SlashCommandInteractionData) error {
+	if _, ok := b.isUserInVoice(e); !ok {
+		return InvisibleReply("You must be in a voice channel to use this command.", e)
+	}
+
+	if err := b.Client.UpdateVoiceState(context.TODO(), *e.GuildID(), nil, botMuted, botDeafened); err != nil {
+		slog.Error("failed to join voice channel", "error", err)
+		return Reply("Failed to join the voice channel.", e)
+	}
+
+	return Reply("Left voice channel.", e)
+}
+
+func ytSearch(e *events.ApplicationCommandInteractionCreate, d discord.SlashCommandInteractionData) error {
+	Defer(e)
+
+	query := d.String("query")
 	maxResults := 5
 
-	if len(data.Options) > 1 {
-		maxResults = data.Int("limit")
+	if len(d.Options) > 1 {
+		maxResults = d.Int("limit")
 		if maxResults != 0 && maxResults < 0 || maxResults > 25 {
 			slog.Debug("limit must be between 0 and 25")
-			return EditDeferred("Limit must be between 0 and 25", event)
+			return EditDeferred("Limit must be between 0 and 25", e)
 		}
 	}
 
@@ -34,7 +68,7 @@ func ytSearch(event *events.ApplicationCommandInteractionCreate, data discord.Sl
 
 	if err != nil {
 		slog.Error("error running ytdlp for query", "error", err)
-		return EditDeferred("Error running ytdlp for query", event)
+		return EditDeferred("Error running ytdlp for query", e)
 	}
 
 	rawResults := strings.Split(out.Stdout, "\n")
@@ -57,7 +91,7 @@ func ytSearch(event *events.ApplicationCommandInteractionCreate, data discord.Sl
 
 	if len(reply) > 1999 {
 		slog.Debug("reply too long, consider using a smaller limit")
-		return EditDeferred("Reply too long, consider using a smaller limit.", event)
+		return EditDeferred("Reply too long, consider using a smaller limit.", e)
 	}
-	return EditDeferred(reply, event)
+	return EditDeferred(reply, e)
 }

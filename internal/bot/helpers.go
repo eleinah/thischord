@@ -5,7 +5,17 @@ import (
 	"strings"
 
 	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
 )
+
+func (b *Bot) isUserInVoice(e *events.ApplicationCommandInteractionCreate) (discord.VoiceState, bool) {
+	voiceState, ok := b.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
+	if !ok {
+		return discord.VoiceState{}, false
+	}
+
+	return voiceState, ok
+}
 
 func getCommandOptions(cmdIface discord.ApplicationCommandCreate) string {
 	body := strings.Builder{}
