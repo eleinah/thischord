@@ -5,6 +5,7 @@ import (
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/eleinah/thischord/internal/logging"
@@ -48,8 +49,21 @@ var commands = []discord.ApplicationCommandCreate{
 	},
 }
 
+func logHandledCommands(cmds map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error) {
+	for name := range cmds {
+		for _, cmd := range commands {
+			if name == getCommandName(cmd) {
+				strOptions := getCommandOptions(cmd)
+				desc := getCommandDescription(cmd)
+				slog.Info("retrieved command", "name", name, "options", strOptions, "description", desc)
+			}
+		}
+	}
+	slog.Info("sucessfully registered commands")
+}
+
 func registerCommands(client bot.Client) {
-	slog.Info("registering slash commands...")
+	slog.Info("registering slash commands")
 	if err := handler.SyncCommands(client, commands, []snowflake.ID{GuildID}); err != nil {
 		logging.FatalLog("error registering commands", err)
 	}

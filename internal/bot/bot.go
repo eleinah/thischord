@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
@@ -30,6 +31,8 @@ type Bot struct {
 
 func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCreate) {
 	data := event.SlashCommandInteractionData()
+
+	slog.Info("interaction received", "username", event.User().Username, "command", data.CommandName(), "args", getCommandArgs(data.CommandName(), data))
 
 	handler, ok := b.Handlers[data.CommandName()]
 	if !ok {
@@ -85,10 +88,14 @@ func Run() {
 
 	registerCommands(client)
 	b.Handlers = map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error{
-		"ytsearch": b.ytSearch,
+		"ytsearch": ytSearch,
 	}
+	logHandledCommands(b.Handlers)
 
-	if err = client.OpenGateway(context.TODO()); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err = client.OpenGateway(ctx); err != nil {
 		logging.FatalLog("error opening gateway", err)
 	}
 
