@@ -11,7 +11,7 @@ import (
 	"github.com/lrstanley/go-ytdlp"
 )
 
-func (b *Bot) ytSearch(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
+func ytSearch(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	Defer(event)
 
 	query := data.String("query")
