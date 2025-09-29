@@ -27,7 +27,7 @@ func getCommandOptions(cmdIface discord.ApplicationCommandCreate) string {
 }
 
 func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) string {
-	args := strings.Builder{}
+	var args strings.Builder
 
 	for _, command := range commands {
 		if ok := func(iface discord.ApplicationCommandCreate) bool {
@@ -37,18 +37,30 @@ func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) st
 					for _, opt := range cmd.Options {
 						optName := opt.OptionName()
 						optType := opt.Type()
+						optStr := "%s='%v'"
 						switch optType {
 						case discord.ApplicationCommandOptionTypeBool:
-							args.WriteString(fmt.Sprintf("'%s'='%v'", optName, data.Bool(optName)))
+							args.WriteString(fmt.Sprintf(optStr, optName, data.Bool(optName)))
 							args.WriteString(" | ")
 						case discord.ApplicationCommandOptionTypeFloat:
-							args.WriteString(fmt.Sprintf("'%s'='%v'", optName, data.Float(optName)))
+							args.WriteString(fmt.Sprintf(optStr, optName, data.Float(optName)))
 							args.WriteString(" | ")
 						case discord.ApplicationCommandOptionTypeInt:
-							args.WriteString(fmt.Sprintf("'%s'='%v'", optName, data.Int(optName)))
-							args.WriteString(" | ")
+							switch optName {
+							case "limit":
+								if data.Int(optName) == 0 {
+									args.WriteString(fmt.Sprintf(optStr, optName, "default"))
+									args.WriteString(" | ")
+								} else {
+									args.WriteString(fmt.Sprintf(optStr, optName, data.Int(optName)))
+									args.WriteString(" | ")
+								}
+							default:
+								args.WriteString(fmt.Sprintf(optStr, optName, data.Int(optName)))
+								args.WriteString(" | ")
+							}
 						case discord.ApplicationCommandOptionTypeString:
-							args.WriteString(fmt.Sprintf("'%s'='%v'", optName, data.String(optName)))
+							args.WriteString(fmt.Sprintf(optStr, optName, data.String(optName)))
 							args.WriteString(" | ")
 						default:
 							return false
@@ -63,7 +75,8 @@ func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) st
 			return ""
 		}
 	}
-	return strings.TrimSpace(args.String())
+	strArgs := strings.TrimSpace(args.String())
+	return strArgs[:len(strArgs)-2]
 }
 
 func getCommandName(iface discord.ApplicationCommandCreate) string {
