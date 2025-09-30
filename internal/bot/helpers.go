@@ -51,27 +51,27 @@ func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) st
 						switch optType {
 						case discord.ApplicationCommandOptionTypeBool:
 							args.WriteString(fmt.Sprintf(optStr, optName, data.Bool(optName)))
-							args.WriteString(" | ")
+							args.WriteString(", ")
 						case discord.ApplicationCommandOptionTypeFloat:
 							args.WriteString(fmt.Sprintf(optStr, optName, data.Float(optName)))
-							args.WriteString(" | ")
+							args.WriteString(", ")
 						case discord.ApplicationCommandOptionTypeInt:
 							switch optName {
 							case "limit":
 								if data.Int(optName) == 0 {
 									args.WriteString(fmt.Sprintf(optStr, optName, "default"))
-									args.WriteString(" | ")
+									args.WriteString(", ")
 								} else {
 									args.WriteString(fmt.Sprintf(optStr, optName, data.Int(optName)))
-									args.WriteString(" | ")
+									args.WriteString(", ")
 								}
 							default:
 								args.WriteString(fmt.Sprintf(optStr, optName, data.Int(optName)))
-								args.WriteString(" | ")
+								args.WriteString(", ")
 							}
 						case discord.ApplicationCommandOptionTypeString:
 							args.WriteString(fmt.Sprintf(optStr, optName, data.String(optName)))
-							args.WriteString(" | ")
+							args.WriteString(", ")
 						default:
 							return false
 						}
@@ -88,7 +88,7 @@ func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) st
 
 	strArgs := strings.TrimSpace(args.String())
 	if len(strArgs) != 0 {
-		return strArgs[:len(strArgs)-2]
+		return strArgs[:len(strArgs)-1]
 	}
 	return strArgs
 }
