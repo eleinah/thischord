@@ -36,17 +36,6 @@ var commands = []discord.ApplicationCommandCreate{
 			},
 		},
 	},
-	discord.SlashCommandCreate{
-		Name:        "ytplay",
-		Description: "play a YouTube video",
-		Options: []discord.ApplicationCommandOption{
-			discord.ApplicationCommandOptionString{
-				Name:        "url",
-				Description: "youtube url eg. https://www.youtube.com/watch?=???????????",
-				Required:    true,
-			},
-		},
-	},
 }
 
 func logHandledCommands(cmds map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error) {
