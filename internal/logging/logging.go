@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"errors"
 	"log/slog"
 	"os"
 	"time"
@@ -18,19 +19,14 @@ const (
 	ANSICyan
 	ANSIWhite
 	ANSIGray
-	ANSIBrightRed
-	ANSIBrightGreen
-	ANSIBrightYellow
-	ANSIBrightBlue
-	ANSIBrightMagenta
-	ANSIBrightCyan
-	ANSIBrightWhite
 )
 
 func colorizeAttr(groups []string, a slog.Attr) slog.Attr {
 	switch a.Key {
 	case "error":
-		return tint.Attr(ANSIBrightRed, a)
+		return tint.Attr(ANSIRed, a)
+	case "err":
+		return tint.Attr(ANSIRed, a)
 	case "description":
 		return tint.Attr(ANSIGray, a)
 	case "name":
@@ -38,22 +34,40 @@ func colorizeAttr(groups []string, a slog.Attr) slog.Attr {
 	case "options":
 		return tint.Attr(ANSIGray, a)
 	case "username":
-		return tint.Attr(ANSIBrightBlue, a)
+		return tint.Attr(ANSIBlue, a)
 	case "command":
-		return tint.Attr(ANSIBrightBlue, a)
+		return tint.Attr(ANSIBlue, a)
 	case "args":
-		return tint.Attr(ANSIBrightBlue, a)
+		return tint.Attr(ANSIBlue, a)
+	case "arg":
+		return tint.Attr(ANSIRed, a)
+	case "stack":
+		return tint.Attr(ANSIMagenta, a)
 	case "version":
-		return tint.Attr(ANSIBrightGreen, a)
+		return tint.Attr(ANSIGreen, a)
+	case "node_version":
+		return tint.Attr(ANSIGreen, a)
+	case "node_session_id":
+		return tint.Attr(ANSIGreen, a)
+	case "event":
+		return tint.Attr(ANSIYellow, a)
 	}
 	return a
 }
 
-func SetDefaultLogger() {
+func SetDefaultLogger(mode string) {
 	opts := &tint.Options{
-		Level:       slog.LevelInfo,
 		TimeFormat:  time.Kitchen,
 		ReplaceAttr: colorizeAttr,
+	}
+
+	switch mode {
+	case "debug":
+		opts.Level = slog.LevelDebug
+	case "info":
+		opts.Level = slog.LevelInfo
+	default:
+		FatalLog("unknown mode", errors.New("invalid logger level"))
 	}
 
 	h := tint.NewHandler(os.Stderr, opts)

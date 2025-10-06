@@ -3,6 +3,7 @@ package bot
 import (
 	"errors"
 	"log/slog"
+	"regexp"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -10,9 +11,16 @@ import (
 )
 
 var (
-	Token            string
-	DisabledCommands = make(map[string]bool)
-	GuildID          snowflake.ID
+	urlPattern    = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
+	searchPattern = regexp.MustCompile(`^(.{2})search:(.+)`)
+
+	Token   string
+	GuildID snowflake.ID
+
+	NodeName     string
+	NodeAddress  string
+	NodePassword string
+	NodeSecure   bool
 )
 
 func Reply(content string, e *events.ApplicationCommandInteractionCreate) error {
@@ -38,7 +46,7 @@ func InvisibleReply(content string, e *events.ApplicationCommandInteractionCreat
 	return nil
 }
 
-func Defer(e *events.ApplicationCommandInteractionCreate) error {
+func DeferReply(e *events.ApplicationCommandInteractionCreate) error {
 	if err := e.DeferCreateMessage(false); err != nil {
 		slog.Error("error deferring interaction", "error", err)
 		return errors.New("error deferring interaction")
@@ -46,7 +54,7 @@ func Defer(e *events.ApplicationCommandInteractionCreate) error {
 	return nil
 }
 
-func EditDeferred(content string, e *events.ApplicationCommandInteractionCreate) error {
+func EditDeferredReply(content string, e *events.ApplicationCommandInteractionCreate) error {
 	if _, err := e.Client().Rest().UpdateInteractionResponse(e.ApplicationID(), e.Token(), discord.MessageUpdate{
 		Content: &content,
 	}); err != nil {

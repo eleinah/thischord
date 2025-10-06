@@ -5,23 +5,14 @@ import (
 	"strings"
 
 	"github.com/disgoorg/disgo/discord"
-	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
-func (b *Bot) isUserInVoice(e *events.ApplicationCommandInteractionCreate) (discord.VoiceState, bool) {
-	voiceState, ok := b.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
-	if !ok {
-		return discord.VoiceState{}, false
-	}
-
-	return voiceState, ok
-}
-
-func getCommandOptions(cmdIface discord.ApplicationCommandCreate) string {
+func getCommandOptions(iface discord.ApplicationCommandCreate) string {
 	body := strings.Builder{}
 
 	body.WriteString("[")
-	switch cmd := cmdIface.(type) {
+	switch cmd := iface.(type) {
 	case discord.SlashCommandCreate:
 		for i, option := range cmd.Options {
 			if i < len(cmd.Options)-1 {
@@ -36,7 +27,8 @@ func getCommandOptions(cmdIface discord.ApplicationCommandCreate) string {
 	return body.String()
 }
 
-func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) string {
+// TODO: clean this up when making search command generic
+func getCommandArgs(cmdName string, d discord.SlashCommandInteractionData) string {
 	var args strings.Builder
 
 	for _, command := range commands {
@@ -50,27 +42,27 @@ func getCommandArgs(cmdName string, data discord.SlashCommandInteractionData) st
 						optStr := "%s='%v'"
 						switch optType {
 						case discord.ApplicationCommandOptionTypeBool:
-							args.WriteString(fmt.Sprintf(optStr, optName, data.Bool(optName)))
+							args.WriteString(fmt.Sprintf(optStr, optName, d.Bool(optName)))
 							args.WriteString(", ")
 						case discord.ApplicationCommandOptionTypeFloat:
-							args.WriteString(fmt.Sprintf(optStr, optName, data.Float(optName)))
+							args.WriteString(fmt.Sprintf(optStr, optName, d.Float(optName)))
 							args.WriteString(", ")
 						case discord.ApplicationCommandOptionTypeInt:
 							switch optName {
 							case "limit":
-								if data.Int(optName) == 0 {
+								if d.Int(optName) == 0 {
 									args.WriteString(fmt.Sprintf(optStr, optName, "default"))
 									args.WriteString(", ")
 								} else {
-									args.WriteString(fmt.Sprintf(optStr, optName, data.Int(optName)))
+									args.WriteString(fmt.Sprintf(optStr, optName, d.Int(optName)))
 									args.WriteString(", ")
 								}
 							default:
-								args.WriteString(fmt.Sprintf(optStr, optName, data.Int(optName)))
+								args.WriteString(fmt.Sprintf(optStr, optName, d.Int(optName)))
 								args.WriteString(", ")
 							}
 						case discord.ApplicationCommandOptionTypeString:
-							args.WriteString(fmt.Sprintf(optStr, optName, data.String(optName)))
+							args.WriteString(fmt.Sprintf(optStr, optName, d.String(optName)))
 							args.WriteString(", ")
 						default:
 							return false
@@ -109,4 +101,11 @@ func getCommandDescription(iface discord.ApplicationCommandCreate) string {
 		desc = cmd.Description
 	}
 	return desc
+}
+
+func formatPosition(position lavalink.Duration) string {
+	if position == 0 {
+		return "0:00"
+	}
+	return fmt.Sprintf("%d:%02d", position.Minutes(), position.SecondsPart())
 }

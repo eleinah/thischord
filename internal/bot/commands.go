@@ -7,20 +7,22 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgo/handler"
+	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/eleinah/thischord/internal/logging"
 )
 
 var commands = []discord.ApplicationCommandCreate{
 	discord.SlashCommandCreate{
-		Name:        "join",
-		Description: "join a voice channel",
+		Name:        "connect",
+		Description: "connect player to voice channel",
 	},
 	discord.SlashCommandCreate{
-		Name:        "leave",
-		Description: "leave a voice channel",
+		Name:        "disconnect",
+		Description: "disconnect the player from voice channel",
 	},
 	discord.SlashCommandCreate{
+		// TODO: refactor this to be generic
 		Name:        "ytsearch",
 		Description: "query YouTube for a song",
 		Options: []discord.ApplicationCommandOption{
@@ -35,6 +37,55 @@ var commands = []discord.ApplicationCommandCreate{
 				Required:    false,
 			},
 		},
+	},
+	discord.SlashCommandCreate{
+		Name:        "play",
+		Description: "play a song",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionString{
+				Name:        "identifier",
+				Description: "song URI or query",
+				Required:    true,
+			},
+			discord.ApplicationCommandOptionString{
+				Name:        "source",
+				Description: "source to search",
+				Required:    false,
+				Choices: []discord.ApplicationCommandOptionChoiceString{
+					{
+						Name:  "YouTube",
+						Value: string(lavalink.SearchTypeYouTube),
+					},
+				},
+			},
+		},
+	},
+	discord.SlashCommandCreate{
+		Name:        "pause",
+		Description: "pause the current song",
+	},
+	discord.SlashCommandCreate{
+		Name:        "now-playing",
+		Description: "show the song that's playing",
+	},
+	discord.SlashCommandCreate{
+		Name:        "stop",
+		Description: "stop the current song and player",
+	},
+	discord.SlashCommandCreate{
+		Name:        "skip",
+		Description: "[WORK IN PROGRESS] skip the current song",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionInt{
+				Name:        "amount",
+				Description: "[WORK IN PROGRESS] amount of songs to skip",
+				Required:    false,
+			},
+		},
+	},
+	discord.SlashCommandCreate{
+		Name:        "shuffle",
+		Description: "[WORK IN PROGRESS] shuffles the queue",
 	},
 }
 

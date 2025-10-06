@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	logging.SetDefaultLogger()
+	logging.SetDefaultLogger("info")
 	slog.Info("starting ThisChord bot")
 	slog.Info("disgo version", "version", disgo.Version)
 }
