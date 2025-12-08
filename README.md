@@ -117,8 +117,8 @@ After=syslog.target network.target
 [Service]
 User=BOT_USER # replace this with the user you run the bot as, i.e. bot
 Group=BOT_GROUP # replace this with the user's group you run the bot as, i.e., bot
-WorkingDirectory=/path/to/bin/with/bot
-ExecStart=/path/to/bin/with/bot/thischord
+WorkingDirectory=/path/to/bin/with/bot # i.e. /home/bot
+ExecStart=/path/to/bin/with/bot/thischord # i.e /home/bot/thischord
 Restart=on-failure
 RestartSec=5s
 
