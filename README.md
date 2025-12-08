@@ -135,6 +135,9 @@ Navigate to `$GOBIN`, or wherever you placed the `thischord` binary, and create 
 
 ## Starting the Music Bot
 
+> [!IMPORTANT]
+> Please ensure you have [yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation#third-party-package-managers) and [ffmpeg](https://www.ffmpeg.org/download.html) installed before starting the bot.
+
 You'll want to reload the systemctl daemon:
 
 ```sh
