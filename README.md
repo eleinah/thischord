@@ -20,13 +20,13 @@
 3. [Missing Features](#missing-features)
 4. [Planned Additions](#planned-additions)
 5. [Getting Started with Lavalink](#getting-started-with-lavalink)
-   i. [Installing Lavalink](#installing-lavalink)
-   ii. [Setting up Lavalink as a Service](#setting-up-lavalink-as-a-service)
-   iii. [Configuring Lavalink](#configuring-lavalink)
+   1. [Installing Lavalink](#installing-lavalink)
+   2. [Setting up Lavalink as a Service](#setting-up-lavalink-as-a-service)
+   3. [Configuring Lavalink](#configuring-lavalink)
 6. [Getting Started with ThisChord](#getting-started-with-thischord)
-   i. [Installing ThisChord](#installing-thischord)
-   ii. [Setting up ThisChord as a Service](#setting-up-thischord-as-a-service)
-   iii. [Configuring Thischord](#configuring-thischord)
+   1. [Installing ThisChord](#installing-thischord)
+   2. [Setting up ThisChord as a Service](#setting-up-thischord-as-a-service)
+   3. [Configuring Thischord](#configuring-thischord)
 
 ### Prerequisites
 
