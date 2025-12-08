@@ -10,7 +10,7 @@
 
 </div>
 
-## A Discord music bot hoping to act as a drop-in replacement for jMusicBot, built with Go.
+## A Discord music bot hoping to act as a comparable replacement for jMusicBot, built with Go.
 ### This is meant to be self-hosted and can support 1 guild per instance.
 
 ## Summary
