@@ -108,6 +108,9 @@ Check **Guild Install** only, and ensure the scope has `applications.commands` a
 * Use Voice Activity
 * View Channels
 
+> [!TIP]
+> You'll use the URL found under `Install Link` to invite the bot to your server.
+
 ### Bot
 
 Here, give your bot an optional profile picture, and a username. Ensure the following are enabled:
