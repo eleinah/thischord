@@ -19,6 +19,10 @@
 2. [Features](#features)
 3. [Missing Features](#missing-features)
 4. [Planned Additions](#planned-additions)
+5. [Making a Discord Application](#making-a-discord-application)
+   1. [General Information](#general-information)
+   2. [Installation](#installation)
+   3. [Bot](#bot)
 5. [Getting Started with Lavalink](#getting-started-with-lavalink)
    1. [Installing Lavalink](#installing-lavalink)
    2. [Setting up Lavalink as a Service](#setting-up-lavalink-as-a-service)
@@ -31,6 +35,7 @@
 
 ### Prerequisites
 
+* An application created in the [Discord Developer Portal](https://discord.com/developers/applications)
 * Go 1.25.1+
 * Java 17 or higher
 * Lavalink
@@ -77,6 +82,42 @@
   * Searching
   * Skipping
   * etc.
+
+## Making a Discord Application
+
+First, we want to navigate to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application** in the top right, then proceed with editing following sections.
+
+### General Information
+
+We don't really need to change anything here unless you decide to change the name of the application.
+
+### Installation
+
+Check **Guild Install** only, and ensure the scope has `applications.commands` and `bot` in it, then add the following permissions:
+
+* Add Reactions
+* Connect
+* Embed Links
+* Priority Speaker
+* Read Message History
+* Request To Speak
+* Send Messages
+* Send Messages in Threads
+* Speak
+* Use Slash Commands
+* Use Voice Activity
+* View Channels
+
+### Bot
+
+Here, give your bot an optional profile picture, and a username. Ensure the following are enabled:
+
+* Public Bot
+* Presence Intent
+* Server Members Intent
+
+> [!TIP]
+> This is where you'll also get your bot token, under the `Token` section of this page.
 
 ## Getting Started with Lavalink
 
