@@ -8,12 +8,9 @@ import (
 	"github.com/eleinah/thischord/internal/logging"
 )
 
-func init() {
+func main() {
 	logging.SetDefaultLogger("info")
 	slog.Info("starting ThisChord bot")
 	slog.Info("disgo version", "version", disgo.Version)
-}
-
-func main() {
 	bot.Run()
 }
