@@ -33,6 +33,8 @@
 * Go 1.25.1+
 * Java 17 or higher
 * Lavalink
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation#third-party-package-managers)
+* [ffmpeg](https://www.ffmpeg.org/download.html)
 
 ### Features
 
