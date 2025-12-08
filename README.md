@@ -8,6 +8,7 @@
    `--'   `--' `--'`--'`----'  `-----'`--' `--' `---' `--'    `---'  
 </pre>
 
+</div>
 
 ## A Discord music bot hoping to act as a drop-in replacement for jMusicBot, built with Go.
 ### This is meant to be self-hosted and can support 1 guild per instance.
@@ -154,4 +155,3 @@ $ systemctl status thischord.service
 
 That should be all! You now have a music bot for your server! Make sure to periodically check this repo for updates!
 
-</div>
