@@ -23,15 +23,15 @@
    1. [General Information](#general-information)
    2. [Installation](#installation)
    3. [Bot](#bot)
-5. [Getting Started with Lavalink](#getting-started-with-lavalink)
+6. [Getting Started with Lavalink](#getting-started-with-lavalink)
    1. [Installing Lavalink](#installing-lavalink)
    2. [Setting up Lavalink as a Service](#setting-up-lavalink-as-a-service)
    3. [Configuring Lavalink](#configuring-lavalink)
-6. [Getting Started with ThisChord](#getting-started-with-thischord)
+7. [Getting Started with ThisChord](#getting-started-with-thischord)
    1. [Installing ThisChord](#installing-thischord)
    2. [Setting up ThisChord as a Service](#setting-up-thischord-as-a-service)
    3. [Configuring ThisChord](#configuring-thischord)
-7. [Starting the Music Bot](#starting-the-music-bot)
+8. [Starting the Music Bot](#starting-the-music-bot)
 
 ### Prerequisites
 
