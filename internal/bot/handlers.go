@@ -156,6 +156,7 @@ func (b *Bot) play(e *events.ApplicationCommandInteractionCreate, d discord.Slas
 	}
 
 	DeferReply(e)
+	var reply string
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -163,15 +164,14 @@ func (b *Bot) play(e *events.ApplicationCommandInteractionCreate, d discord.Slas
 	var toPlay *lavalink.Track
 	b.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
 		func(track lavalink.Track) {
-			EditDeferredReply(fmt.Sprintf("Loaded track: [`%s`](<%s>)", track.Info.Title, *track.Info.URI), e)
+			reply += fmt.Sprintf("Loaded track: [`%s`](<%s>)", track.Info.Title, *track.Info.URI)
 			toPlay = &track
 		},
 		func(playlist lavalink.Playlist) {
-			EditDeferredReply(fmt.Sprintf("Loaded playlist: `%s` with `%d` tracks", playlist.Info.Name, len(playlist.Tracks)), e)
-			toPlay = &playlist.Tracks[0]
+			EditDeferredReply("Playlists are not yet supported.", e)
 		},
 		func(tracks []lavalink.Track) {
-			EditDeferredReply(fmt.Sprintf("Loaded search result: [`%s`](<%s>)", tracks[0].Info.Title, *tracks[0].Info.URI), e)
+			reply += fmt.Sprintf("Loaded search result: [`%s`](<%s>)", tracks[0].Info.Title, *tracks[0].Info.URI)
 			toPlay = &tracks[0]
 		},
 		func() {
@@ -189,5 +189,14 @@ func (b *Bot) play(e *events.ApplicationCommandInteractionCreate, d discord.Slas
 		return err
 	}
 
-	return b.Lavalink.Player(*e.GuildID()).Update(context.TODO(), lavalink.WithTrack(*toPlay))
+	player := b.Lavalink.ExistingPlayer(*e.GuildID())
+	isPlaying := player != nil && player.Track() != nil && !player.Paused()
+
+	if isPlaying {
+		b.Queue.Tracks = append(b.Queue.Tracks, *toPlay)
+		return EditDeferredReply(reply+"\nAdded to queue!\n-# use `/queue` to see the current queue", e)
+	} else {
+		b.Lavalink.Player(*e.GuildID()).Update(context.TODO(), lavalink.WithTrack(*toPlay))
+	}
+	return EditDeferredReply(reply, e)
 }

@@ -14,8 +14,9 @@ var (
 	urlPattern    = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
 	searchPattern = regexp.MustCompile(`^(.{2})search:(.+)`)
 
-	Token   string
-	GuildID snowflake.ID
+	Token          string
+	GuildID        snowflake.ID
+	DefaultChannel snowflake.ID
 
 	NodeName     string
 	NodeAddress  string

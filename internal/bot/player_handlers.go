@@ -2,8 +2,10 @@ package bot
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
+	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
@@ -18,6 +20,10 @@ func (b *Bot) onPlayerResume(player disgolink.Player, e lavalink.PlayerResumeEve
 
 func (b *Bot) onTrackStart(player disgolink.Player, e lavalink.TrackStartEvent) {
 	slog.Info("track started", "event", e)
+	info := fmt.Sprintf("Now playing: [`%s`](<%s>)", e.Track.Info.Title, *e.Track.Info.URI)
+	b.Client.Rest().CreateMessage(DefaultChannel, discord.NewMessageCreateBuilder().
+		SetContent(info).
+		Build())
 }
 
 func (b *Bot) onTrackEnd(player disgolink.Player, e lavalink.TrackEndEvent) {
@@ -25,24 +31,26 @@ func (b *Bot) onTrackEnd(player disgolink.Player, e lavalink.TrackEndEvent) {
 		return
 	}
 
-	queue := b.Queues.Get(e.GuildID())
 	var (
 		nextTrack lavalink.Track
 		ok        bool
 	)
-	switch queue.Type {
+	switch b.Queue.Type {
 	case QueueTypeNormal:
-		nextTrack, ok = queue.Next()
+		nextTrack, ok = b.Queue.Next()
 
 	case QueueTypeRepeatTrack:
 		nextTrack = e.Track
 
 	case QueueTypeRepeatQueue:
-		queue.Add(e.Track)
-		nextTrack, ok = queue.Next()
+		b.Queue.Add(e.Track)
+		nextTrack, ok = b.Queue.Next()
 	}
 
 	if !ok {
+		b.Client.Rest().CreateMessage(DefaultChannel, discord.NewMessageCreateBuilder().
+			SetContent("Queue concluded.").
+			Build())
 		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {

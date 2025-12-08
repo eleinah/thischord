@@ -74,18 +74,19 @@ var commands = []discord.ApplicationCommandCreate{
 	},
 	discord.SlashCommandCreate{
 		Name:        "skip",
-		Description: "[WORK IN PROGRESS] skip the current song",
-		Options: []discord.ApplicationCommandOption{
-			discord.ApplicationCommandOptionInt{
-				Name:        "amount",
-				Description: "[WORK IN PROGRESS] amount of songs to skip",
-				Required:    false,
-			},
-		},
+		Description: "skip the current song",
 	},
 	discord.SlashCommandCreate{
 		Name:        "shuffle",
-		Description: "[WORK IN PROGRESS] shuffles the queue",
+		Description: "shuffles the queue",
+	},
+	discord.SlashCommandCreate{
+		Name:        "queue",
+		Description: "displays the queue",
+	},
+	discord.SlashCommandCreate{
+		Name:        "clear-queue",
+		Description: "clears the queue",
 	},
 }
 

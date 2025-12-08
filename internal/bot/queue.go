@@ -4,8 +4,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/disgoorg/snowflake/v2"
-
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
@@ -58,37 +56,6 @@ func (q *Queue) Next() (lavalink.Track, bool) {
 	return track, true
 }
 
-func (q *Queue) Skip(amount int) (lavalink.Track, bool) {
-	if len(q.Tracks) == 0 {
-		return lavalink.Track{}, false
-	}
-	if amount > len(q.Tracks) {
-		amount = len(q.Tracks)
-	}
-	q.Tracks = q.Tracks[amount:]
-	return q.Tracks[0], true
-}
-
 func (q *Queue) Clear() {
 	q.Tracks = make([]lavalink.Track, 0)
-}
-
-type QueueManager struct {
-	queues map[snowflake.ID]*Queue
-}
-
-func (q *QueueManager) Get(guildID snowflake.ID) *Queue {
-	queue, ok := q.queues[guildID]
-	if !ok {
-		queue = &Queue{
-			Tracks: make([]lavalink.Track, 0),
-			Type:   QueueTypeNormal,
-		}
-		q.queues[guildID] = queue
-	}
-	return queue
-}
-
-func (q *QueueManager) Delete(guildID snowflake.ID) {
-	delete(q.queues, guildID)
 }

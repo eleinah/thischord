@@ -17,6 +17,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgo/gateway"
 	"github.com/disgoorg/disgolink/v3/disgolink"
+	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/eleinah/thischord/internal/logging"
 	"github.com/joho/godotenv"
@@ -37,6 +38,12 @@ func setup() {
 		logging.FatalLog("no Discord guild ID found in .env file", nil)
 	}
 	GuildID = snowflake.MustParse(rawGuildID)
+
+	rawDefaultChannel := os.Getenv("DISCORD_DEFAULT_CHANNEL_ID")
+	if rawDefaultChannel == "" {
+		logging.FatalLog("no default channel ID found in .env file", nil)
+	}
+	DefaultChannel = snowflake.MustParse(rawDefaultChannel)
 
 	NodeName = os.Getenv("NODE_NAME")
 	if NodeName == "" {
@@ -123,11 +130,10 @@ func Run() {
 		"pause":       b.pause,
 		"now-playing": b.nowPlaying,
 		"stop":        b.stop,
-		"queue":       b.queue,      // TODO: finish implementing
-		"clear-queue": b.clearQueue, // TODO: finish implementing
-		"queue-type":  b.queueType,  // TODO: finish implementing
-		"shuffle":     b.shuffle,    // TODO: finish implementing
-		"skip":        b.skip,       // TODO: finish implementing
+		"queue":       b.queue,
+		"clear-queue": b.clearQueue,
+		"shuffle":     b.shuffle,
+		"skip":        b.skip,
 	}
 	logHandledCommands(b.Handlers)
 
@@ -163,14 +169,19 @@ func Run() {
 }
 
 func newBot() *Bot {
-	return &Bot{}
+	return &Bot{
+		Queue: &Queue{
+			Tracks: []lavalink.Track{},
+			Type:   QueueTypeNormal,
+		},
+	}
 }
 
 type Bot struct {
 	Client   bot.Client
 	Lavalink disgolink.Client
 	Handlers map[string]func(e *events.ApplicationCommandInteractionCreate, d discord.SlashCommandInteractionData) error
-	Queues   *QueueManager
+	Queue    *Queue
 }
 
 func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCreate) {
@@ -195,7 +206,7 @@ func (b *Bot) onVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
 	}
 	b.Lavalink.OnVoiceStateUpdate(context.TODO(), event.VoiceState.GuildID, event.VoiceState.ChannelID, event.VoiceState.SessionID)
 	if event.VoiceState.ChannelID == nil {
-		b.Queues.Delete(event.VoiceState.GuildID)
+		return
 	}
 }
 
