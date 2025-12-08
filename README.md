@@ -85,7 +85,7 @@
 
 ## Making a Discord Application
 
-First, we want to navigate to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application** in the top right, then proceed with editing following sections.
+First, we want to navigate to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application** in the top right, then proceed with editing the following sections.
 
 ### General Information
 
