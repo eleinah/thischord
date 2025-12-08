@@ -4,6 +4,7 @@ go 1.25.1
 
 require (
 	github.com/disgoorg/disgo v0.18.16
+	github.com/disgoorg/disgolink/v3 v3.0.4
 	github.com/disgoorg/snowflake/v2 v2.0.3
 	github.com/joho/godotenv v1.5.1
 	github.com/lmittmann/tint v1.1.2
@@ -12,7 +13,6 @@ require (
 require (
 	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
-	github.com/disgoorg/disgolink/v3 v3.0.4 // indirect
 	github.com/ulikunitz/xz v0.5.13 // indirect
 )
 
