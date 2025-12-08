@@ -26,7 +26,7 @@
 6. [Getting Started with ThisChord](#getting-started-with-thischord)
    1. [Installing ThisChord](#installing-thischord)
    2. [Setting up ThisChord as a Service](#setting-up-thischord-as-a-service)
-   3. [Configuring Thischord](#configuring-thischord)
+   3. [Configuring ThisChord](#configuring-thischord)
 7. [Starting the Music Bot](#starting-the-music-bot)
 
 ### Prerequisites
