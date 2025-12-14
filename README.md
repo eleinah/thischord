@@ -159,7 +159,8 @@ Create a file in `/etc/systemd/system` named `thischord.service` with the follow
 ```
 [Unit]
 Description=ThisChord Music Bot
-After=syslog.target network.target
+After=lavalink.service syslog.target network.target
+Requires=lavalink.service
 
 [Service]
 User=BOT_USER # replace this with the user you run the bot as, i.e. bot
